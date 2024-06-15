@@ -223,7 +223,7 @@ client.on('message', async msg => {
                  }
 
                 // Form the filename
-                 const fullPath = path.join(dir, cleanedNotifyName, `${timestamp}.ogg`);
+                 const fullPath = path.join(dir, `${timestamp}.ogg`);
                  
                  fs.writeFile(fullPath, binaryData, function (err) {
                      console.log(err)
