@@ -41,9 +41,8 @@ def transcribe_audio(audio: Audio):
     return transcription.text
 
 
-def translate_audio(audio: Audio):
-    print(audio.filePath)
-    audio_fp = audio.filePath
+def translate_audio(audio_fp):
+    print(audio_fp)
     audio_file = open(audio_fp, "rb")
     translation = client.audio.translations.create(
         model="whisper-1",
