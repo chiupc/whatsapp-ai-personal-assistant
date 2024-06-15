@@ -233,23 +233,28 @@ client.on('message', async msg => {
                  //const currentDirectory = process.cwd()
                  //const fullAbsolutePath = path.join(currentDirectory, fullPath)
                  //console.log(fullAbsolutePath)
-                 const inputData = {
-                     content_type: 'audio',  // Replace with actual audio data
-                     username: cleanedNotifyName
-                 };
-
-                 // Make a POST request to the FastAPI endpoint
-                 axios.post('http://127.0.0.1:8000/summarize/', inputData)
-                         .then(response => {
-                             console.log('Response:', response.data);
-                         })
-                         .catch(error => {
-                             console.error('Error:', error);
-                         });
+                 
                      });
 
                 
 	}
+    else if (msg.body === 'summarize'){
+        const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+        const inputData = {
+            content_type: 'audio',  // Replace with actual audio data
+            username: cleanedNotifyName
+        };
+
+        // Make a POST request to the FastAPI endpoint
+        axios.post('http://127.0.0.1:8000/summarize/', inputData)
+            .then(response => {
+                console.log('Response:', response.data);
+                client.sendMessage(msg.from, response.data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 	else if (msg.body === '!quoteinfo' && msg.hasQuotedMsg) {
         const quotedMsg = await msg.getQuotedMessage();
 
