@@ -116,7 +116,7 @@ def create_item(audio: Audio):
 def summarize_audio(in_parms: SummaryInput):
     print(in_parms)
     username = in_parms.username
-    in_type = in_parms.type
+    in_type = in_parms.content_type
     if in_type == 'audio':
         instructions = summarize_audio(username)
     return {"message": instructions}
