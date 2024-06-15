@@ -239,7 +239,7 @@ client.on('message', async msg => {
 
                 
 	}
-    else if (msg.body === 'summarize'){
+    else if (msg.body.toLowerCase() === 'summarize'){
         const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
         const inputData = {
             content_type: 'audio',  // Replace with actual audio data
