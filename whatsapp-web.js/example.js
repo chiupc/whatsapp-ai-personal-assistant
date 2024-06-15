@@ -227,24 +227,26 @@ client.on('message', async msg => {
                  fs.writeFile(fullPath, binaryData, function (err) {
                      console.log(err)
                              })
+
+                 // Data to send to the FastAPI endpoint
+                 const currentDirectory = process.cwd()
+                 const fullAbsolutePath = path.join(currentDirectory, fullPath)
+                 console.log(fullAbsolutePath)
+                 const audioData = {
+                     filePath: fullAbsolutePath  // Replace with actual audio data
+                 };
+
+                 // Make a POST request to the FastAPI endpoint
+                 axios.post('http://127.0.0.1:8000/transcribe/', audioData)
+                         .then(response => {
+                             console.log('Response:', response.data);
+                         })
+                         .catch(error => {
+                             console.error('Error:', error);
+                         });
                      });
 
-                // Data to send to the FastAPI endpoint
-                const currentDirectory = process.cwd()
-                const fullAbsolutePath = path.join(currentDirectory, fullPath)
-                console.log(fullAbsolutePath)
-                const audioData = {
-                    filePath: fullAbsolutePath  // Replace with actual audio data
-                };
-        
-                // Make a POST request to the FastAPI endpoint
-                axios.post('http://127.0.0.1:8000/transcribe/', audioData)
-                    .then(response => {
-                        console.log('Response:', response.data);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
+                
 	}
 	else if (msg.body === '!quoteinfo' && msg.hasQuotedMsg) {
         const quotedMsg = await msg.getQuotedMessage();
