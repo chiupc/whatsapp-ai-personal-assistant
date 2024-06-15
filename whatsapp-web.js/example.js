@@ -212,6 +212,7 @@ client.on('message', async msg => {
                              const dataPath = '/home/chiupc/ai-personal-assistant/whatsapp-ai-personal-assistant/data/audio/'
                  const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
                  const timestamp = msg._data.t
+                 const msg_id = msg._data.id.id
                  const incomingDir = path.join(dataPath, 'incoming')
                  const dir = path.join(incomingDir, cleanedNotifyName);
 
@@ -223,7 +224,7 @@ client.on('message', async msg => {
                  }
 
                 // Form the filename
-                 const fullPath = path.join(dir, `${timestamp}.ogg`);
+                 const fullPath = path.join(dir, `${timestamp}_${msg_id}.ogg`);
                  
                  fs.writeFile(fullPath, binaryData, function (err) {
                      console.log(err)
