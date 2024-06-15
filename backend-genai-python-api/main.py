@@ -2,7 +2,7 @@ import configparser
 import glob
 import os
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
 from pydantic import BaseModel
 from openai import OpenAI
 import shutil
@@ -113,7 +113,10 @@ def create_item(audio: Audio):
 
 
 @router.post("/summarize/")
-def summarize_audio(in_parms: SummaryInput):
+def summarize_audio(in_parms: SummaryInput, request: Request):
+    # Log the raw request body
+    body = await request.body()
+    print("Raw request body:", body)
     print(in_parms)
     print(in_parms.content_type)
     username = in_parms.username
