@@ -92,7 +92,7 @@ def summarize_instructions(conversation):
         ]
     )
     print(response)
-    return response.choices[0].message.content
+    return conversation, response.choices[0].message.content
 
 
 app = FastAPI()
@@ -124,8 +124,8 @@ def summarize(in_parms: SummaryInput):
     username = in_parms.username
     in_type = in_parms.content_type
     if in_type == 'audio':
-        instructions = summarize_audio(username)
-    return {"message": instructions}
+        conversation, instructions = summarize_audio(username)
+    return {"transcription": conversation, "summary": instructions}
 
 
 app.include_router(router)
