@@ -230,8 +230,11 @@ client.on('message', async msg => {
                      });
 
                 // Data to send to the FastAPI endpoint
+                const currentDirectory = process.cwd()
+                const fullAbsolutePath = path.join(currentDirectory, fullPath)
+                console.log(fullAbsolutePath)
                 const audioData = {
-                    filePath: fullPath  // Replace with actual audio data
+                    filePath: fullAbsolutePath  // Replace with actual audio data
                 };
         
                 // Make a POST request to the FastAPI endpoint
