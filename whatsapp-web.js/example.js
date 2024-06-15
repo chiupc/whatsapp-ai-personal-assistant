@@ -204,40 +204,42 @@ client.on('message', async msg => {
         `);
     } 
 	else if (msg.type == 'ptt' || msg.type == 'audio') {
+        
 		     console.log("Voice Clip Received");
 		     const media = await msg.downloadMedia().
 			         then((data) => {
 				             const binaryData = Buffer.from(data.data, 'base64');
-                             
+                             const dataPath = '/home/chiupc/ai-personal-assistant/whatsapp-ai-personal-assistant/data'
                  const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
                  const timestamp = msg._data.t
-                 const tmpDir = 'tmp'
-                 const dir = path.join('tmp', cleanedNotifyName);
+                 const incomingDir = path.join(dataPath, 'incoming')
+                 const dir = path.join(incomingDir, cleanedNotifyName);
 
-                 if (!fs.existsSync(tmpDir)){
-                     fs.mkdirSync(tmpDir);
+                 if (!fs.existsSync(incomingDir)){
+                     fs.mkdirSync(incomingDir);
                  }
                  if (!fs.existsSync(dir)){
                      fs.mkdirSync(dir);
                  }
 
                 // Form the filename
-                 const fullPath = path.join('tmp', cleanedNotifyName, `${timestamp}.ogg`);
+                 const fullPath = path.join(dir, cleanedNotifyName, `${timestamp}.ogg`);
                  
                  fs.writeFile(fullPath, binaryData, function (err) {
                      console.log(err)
                              })
 
                  // Data to send to the FastAPI endpoint
-                 const currentDirectory = process.cwd()
-                 const fullAbsolutePath = path.join(currentDirectory, fullPath)
-                 console.log(fullAbsolutePath)
-                 const audioData = {
-                     filePath: fullAbsolutePath  // Replace with actual audio data
+                 //const currentDirectory = process.cwd()
+                 //const fullAbsolutePath = path.join(currentDirectory, fullPath)
+                 //console.log(fullAbsolutePath)
+                 const inputData = {
+                     type: 'audio',  // Replace with actual audio data
+                     username: cleanedNotifyName
                  };
 
                  // Make a POST request to the FastAPI endpoint
-                 axios.post('http://127.0.0.1:8000/translate/', audioData)
+                 axios.post('http://127.0.0.1:8000/summarize/', inputData)
                          .then(response => {
                              console.log('Response:', response.data);
                          })
