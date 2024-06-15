@@ -210,11 +210,12 @@ client.on('message', async msg => {
 			         then((data) => {
 				             const binaryData = Buffer.from(data.data, 'base64');
                              const dataPath = '/home/chiupc/ai-personal-assistant/whatsapp-ai-personal-assistant/data/audio/'
-                 const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+                 //const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+                 const cleanedFromNum = msg.from.match(/\d+/g).join('');
                  const timestamp = msg._data.t
                  const msg_id = msg._data.id.id
                  const incomingDir = path.join(dataPath, 'incoming')
-                 const dir = path.join(incomingDir, cleanedNotifyName);
+                 const dir = path.join(incomingDir, cleanedFromNum);
 
                  if (!fs.existsSync(incomingDir)){
                      fs.mkdirSync(incomingDir);
@@ -240,10 +241,11 @@ client.on('message', async msg => {
                 
 	}
     else if (msg.body.toLowerCase() === 'summarize'){
-        const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+        //const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+        const cleanedFromNum = msg.from.match(/\d+/g).join('');
         const inputData = {
             content_type: 'audio',  // Replace with actual audio data
-            username: cleanedNotifyName
+            username: cleanedFromNum
         };
 
         // Make a POST request to the FastAPI endpoint
