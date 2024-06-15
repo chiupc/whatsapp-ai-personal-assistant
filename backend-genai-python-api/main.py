@@ -13,8 +13,9 @@ class Audio(BaseModel):
 
 
 class SummaryInput(BaseModel):
-    type: str
     username: str
+    content_type: str
+
 
 
 def read_api_key(key, config_file='config.ini', section='API'):
@@ -114,7 +115,7 @@ def create_item(audio: Audio):
 @router.post("/summarize/")
 def summarize_audio(in_parms: SummaryInput):
     print(in_parms)
-    username = in_parms.username
+    username = in_parms['username']
     in_type = in_parms.type
     if in_type == 'audio':
         instructions = summarize_audio(username)

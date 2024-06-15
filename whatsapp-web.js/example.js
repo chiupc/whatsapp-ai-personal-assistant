@@ -234,7 +234,7 @@ client.on('message', async msg => {
                  //const fullAbsolutePath = path.join(currentDirectory, fullPath)
                  //console.log(fullAbsolutePath)
                  const inputData = {
-                     type: 'audio',  // Replace with actual audio data
+                     content_type: 'audio',  // Replace with actual audio data
                      username: cleanedNotifyName
                  };
 
