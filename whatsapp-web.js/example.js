@@ -1,6 +1,7 @@
 const { Client, Location, Poll, List, Buttons, LocalAuth } = require('./index');
 const fs = require('node:fs');
 const path = require('path');
+const axios = require('axios');
 
 const client = new Client({
      authStrategy: new LocalAuth(),
@@ -227,6 +228,20 @@ client.on('message', async msg => {
                      console.log(err)
                              })
                      });
+
+                // Data to send to the FastAPI endpoint
+                const audioData = {
+                    filePath: fullPath  // Replace with actual audio data
+                };
+        
+                // Make a POST request to the FastAPI endpoint
+                axios.post('http://127.0.0.1:8000/transcribe/', audioData)
+                    .then(response => {
+                        console.log('Response:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
 	}
 	else if (msg.body === '!quoteinfo' && msg.hasQuotedMsg) {
         const quotedMsg = await msg.getQuotedMessage();
