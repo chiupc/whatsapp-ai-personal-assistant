@@ -113,12 +113,13 @@ def create_item(audio: Audio):
 
 
 @router.post("/summarize/")
-def summarize_audio(in_parms: SummaryInput, request: Request):
+def summarize(in_parms: SummaryInput):
     # Log the raw request body
     # body = await request.body()
-    print("Raw request body:", request.body)
+    #print("Raw request body:", request.body)
     print(in_parms)
     print(in_parms.content_type)
+    print(in_parms.username)
     username = in_parms.username
     in_type = in_parms.content_type
     if in_type == 'audio':
