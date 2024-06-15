@@ -68,6 +68,8 @@ def summarize_audio(username):
     for ogg_file in ogg_files:
         conversation = conversation + ' ' + translate_audio(ogg_file)
         shutil.move(ogg_file, audio_dir_processed)
+    print('conversation')
+    print(conversation)
     instructions = summarize_instructions(conversation)
     return instructions
 
