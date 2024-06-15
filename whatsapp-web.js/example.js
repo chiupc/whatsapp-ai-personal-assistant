@@ -237,7 +237,7 @@ client.on('message', async msg => {
                  };
 
                  // Make a POST request to the FastAPI endpoint
-                 axios.post('http://127.0.0.1:8000/transcribe/', audioData)
+                 axios.post('http://127.0.0.1:8000/translate/', audioData)
                          .then(response => {
                              console.log('Response:', response.data);
                          })

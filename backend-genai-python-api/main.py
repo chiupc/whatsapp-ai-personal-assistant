@@ -33,6 +33,18 @@ def transcribe_audio(audio: Audio):
     print(transcription.text)
     return transcription.text
 
+def translate_audio(audio: Audio):
+    print(audio.filePath)
+    audio_fp = audio.filePath
+    audio_file = open(audio_fp, "rb")
+    translation = client.audio.translations.create(
+        model="whisper-1",
+        file=audio_file
+    )
+    print(translation)
+    print(translation.text)
+    return translation.text
+
 
 app = FastAPI()
 router = APIRouter()
@@ -40,6 +52,11 @@ client = OpenAI(api_key=read_api_key(key='openai'))
 @router.post("/transcribe/")
 def create_item(audio: Audio):
     trascribed_text = transcribe_audio(audio)
+    return {"message": trascribed_text}
+
+@router.post("/translate/")
+def create_item(audio: Audio):
+    trascribed_text = translate_audio(audio)
     return {"message": trascribed_text}
 
 app.include_router(router)
