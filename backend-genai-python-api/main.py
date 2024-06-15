@@ -113,6 +113,7 @@ def create_item(audio: Audio):
 
 @router.post("/summarize/")
 def summarize_audio(in_parms: SummaryInput):
+    print(in_parms)
     username = in_parms.username
     in_type = in_parms.type
     if in_type == 'audio':
