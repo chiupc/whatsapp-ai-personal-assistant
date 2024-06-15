@@ -22,6 +22,7 @@ def read_api_key(key, config_file='config.ini', section='API'):
 
 
 def transcribe_audio(audio: Audio):
+    print(audio.filePath)
     audio_fp = audio.filePath
     audio_file = open(audio_fp, "rb")
     transcription = client.audio.transcriptions.create(
