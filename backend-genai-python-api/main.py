@@ -11,7 +11,7 @@ class Audio(BaseModel):
     filePath: str
 
 
-def read_api_key(config_file='config.ini', section='API', key):
+def read_api_key(key, config_file='config.ini', section='API'):
     config = configparser.ConfigParser()
     config.read(config_file)
 
