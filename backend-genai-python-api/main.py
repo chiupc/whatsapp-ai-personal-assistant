@@ -44,6 +44,7 @@ def get_audio_conversation(username, do_translate):
 
     print(audio_dir_incoming)
     ogg_files = glob.glob(os.path.join(audio_dir_incoming, '*.ogg'))
+    conversation = ''
     for ogg_file in ogg_files:
         if do_translate:
             conversation = conversation + ' ' + translate_audio(ogg_file)
@@ -53,6 +54,7 @@ def get_audio_conversation(username, do_translate):
     print('conversation')
     print(conversation)
     return conversation
+
 def transcribe_audio(audio_fp):
     print(audio_fp)
     audio_file = open(audio_fp, "rb")
