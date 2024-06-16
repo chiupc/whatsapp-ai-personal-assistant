@@ -204,50 +204,92 @@ client.on('message', async msg => {
         `);
     } 
 	else if (msg.type == 'ptt' || msg.type == 'audio') {
+        
 		     console.log("Voice Clip Received");
 		     const media = await msg.downloadMedia().
 			         then((data) => {
 				             const binaryData = Buffer.from(data.data, 'base64');
-                             
-                 const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+                             const dataPath = '/home/chiupc/ai-personal-assistant/whatsapp-ai-personal-assistant/data/audio/'
+                 //const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+                 const cleanedFromNum = msg.from.match(/\d+/g).join('');
                  const timestamp = msg._data.t
-                 const tmpDir = 'tmp'
-                 const dir = path.join('tmp', cleanedNotifyName);
+                 const msg_id = msg._data.id.id
+                 const incomingDir = path.join(dataPath, 'incoming')
+                 const dir = path.join(incomingDir, cleanedFromNum);
 
-                 if (!fs.existsSync(tmpDir)){
-                     fs.mkdirSync(tmpDir);
+                 if (!fs.existsSync(incomingDir)){
+                     fs.mkdirSync(incomingDir);
                  }
                  if (!fs.existsSync(dir)){
                      fs.mkdirSync(dir);
                  }
 
                 // Form the filename
-                 const fullPath = path.join('tmp', cleanedNotifyName, `${timestamp}.ogg`);
+                 const fullPath = path.join(dir, `${timestamp}_${msg_id}.ogg`);
                  
                  fs.writeFile(fullPath, binaryData, function (err) {
                      console.log(err)
                              })
 
                  // Data to send to the FastAPI endpoint
-                 const currentDirectory = process.cwd()
-                 const fullAbsolutePath = path.join(currentDirectory, fullPath)
-                 console.log(fullAbsolutePath)
-                 const audioData = {
-                     filePath: fullAbsolutePath  // Replace with actual audio data
-                 };
-
-                 // Make a POST request to the FastAPI endpoint
-                 axios.post('http://127.0.0.1:8000/transcribe/', audioData)
-                         .then(response => {
-                             console.log('Response:', response.data);
-                         })
-                         .catch(error => {
-                             console.error('Error:', error);
-                         });
+                 //const currentDirectory = process.cwd()
+                 //const fullAbsolutePath = path.join(currentDirectory, fullPath)
+                 //console.log(fullAbsolutePath)
+                 
                      });
 
                 
 	}
+    else if (msg.body.toLowerCase().includes("summarize") || msg.body.toLowerCase().includes("summarise") 
+        || msg.body.toLowerCase().includes("summary")){
+        client.sendMessage(msg.from, 'Sure, summarizing it for you in a bit.')
+        //const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
+        const cleanedFromNum = msg.from.match(/\d+/g).join('');
+        let doTranslate = true;
+        if(msg.body.toLowerCase().includes("original")) {
+            doTranslate = false;
+        }
+        const inputData = {
+            content_type: 'audio',  // Replace with actual audio data
+            username: cleanedFromNum,
+            do_translate: doTranslate,
+        };
+        // Make a POST request to the FastAPI endpoint
+        axios.post('http://127.0.0.1:8000/summarize/', inputData)
+            .then(response => {
+                console.log('Response:', response.data);
+                client.sendMessage(msg.from, response.data.summary);
+                client.sendMessage(msg.from, response.data.transcription);
+            })
+            .catch(error => {
+                client.sendMessage(msg.from, 'Error in summarizing, please contact admin.')
+                console.error('Error:', error);
+            });
+    }
+    else if (msg.body.toLowerCase().includes('take order')){
+        client.sendMessage(msg.from, 'Got it! Taking the order for you in a bit.')
+        const cleanedFromNum = msg.from.match(/\d+/g).join('');
+        let doTranslate = true;
+        if(msg.body.toLowerCase().includes("original")) {
+            doTranslate = false;
+        }
+        const inputData = {
+            content_type: 'audio',  // Replace with actual audio data
+            username: cleanedFromNum,
+            do_translate: doTranslate,
+        };
+        // Make a POST request to the FastAPI endpoint
+        axios.post('http://127.0.0.1:8000/take_order/', inputData)
+            .then(response => {
+                console.log('Response:', response.data);
+                client.sendMessage(msg.from, response.data.orders);
+                client.sendMessage(msg.from, response.data.transcription);
+            })
+            .catch(error => {
+                client.sendMessage(msg.from, 'Error in extracting orders, please contact admin.')
+                console.error('Error:', error);
+            });
+    }
 	else if (msg.body === '!quoteinfo' && msg.hasQuotedMsg) {
         const quotedMsg = await msg.getQuotedMessage();
 
@@ -482,20 +524,22 @@ client.on('message', async msg => {
 });
 
 client.on('message_create', async (msg) => {
+    
     // Fired on all message creations, including your own
     if (msg.fromMe) {
         // do stuff here
+        console.log(msg.body)
     }
 
     // Unpins a message
-    if (msg.fromMe && msg.body.startsWith('!unpin')) {
+    /*if (msg.fromMe && msg.body.startsWith('!unpin')) {
         const pinnedMsg = await msg.getQuotedMessage();
         if (pinnedMsg) {
             // Will unpin a message
             const result = await pinnedMsg.unpin();
             console.log(result); // True if the operation completed successfully, false otherwise
         }
-    }
+    }*/
 });
 
 client.on('message_ciphertext', (msg) => {
