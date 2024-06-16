@@ -530,12 +530,14 @@ client.on('message_create', async (msg) => {
     }
 
     // Unpins a message
-    if (msg.fromMe && msg.body.startsWith('!unpin')) {
-        const pinnedMsg = await msg.getQuotedMessage();
-        if (pinnedMsg) {
-            // Will unpin a message
-            const result = await pinnedMsg.unpin();
-            console.log(result); // True if the operation completed successfully, false otherwise
+    if (msg.fromMe && msg.body) {
+        if(msg.body.startsWith('!unpin')) {
+            const pinnedMsg = await msg.getQuotedMessage();
+            if (pinnedMsg) {
+                // Will unpin a message
+                const result = await pinnedMsg.unpin();
+                console.log(result); // True if the operation completed successfully, false otherwise
+            }
         }
     }
 });
