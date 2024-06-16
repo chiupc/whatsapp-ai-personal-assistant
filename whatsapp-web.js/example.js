@@ -524,22 +524,22 @@ client.on('message', async msg => {
 });
 
 client.on('message_create', async (msg) => {
+    
     // Fired on all message creations, including your own
     if (msg.fromMe) {
         // do stuff here
+        console.log(msg.body)
     }
 
     // Unpins a message
-    if (msg.fromMe && msg.body) {
-        if(msg.body.startsWith('!unpin')) {
-            const pinnedMsg = await msg.getQuotedMessage();
-            if (pinnedMsg) {
-                // Will unpin a message
-                const result = await pinnedMsg.unpin();
-                console.log(result); // True if the operation completed successfully, false otherwise
-            }
+    /*if (msg.fromMe && msg.body.startsWith('!unpin')) {
+        const pinnedMsg = await msg.getQuotedMessage();
+        if (pinnedMsg) {
+            // Will unpin a message
+            const result = await pinnedMsg.unpin();
+            console.log(result); // True if the operation completed successfully, false otherwise
         }
-    }
+    }*/
 });
 
 client.on('message_ciphertext', (msg) => {
