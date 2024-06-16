@@ -257,8 +257,9 @@ client.on('message', async msg => {
         axios.post('http://127.0.0.1:8000/summarize/', inputData)
             .then(response => {
                 console.log('Response:', response.data);
-                //client.sendMessage(msg.from, response.data.transcription)
                 client.sendMessage(msg.from, response.data.summary);
+                client.sendMessage(msg.from, response.data.transcription);
+                
             })
             .catch(error => {
                 console.error('Error:', error);
