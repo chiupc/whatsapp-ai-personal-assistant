@@ -29,16 +29,14 @@ def read_api_key(key, config_file='config.ini', section='API'):
         raise KeyError(f"'{key}' not found in section '{section}' of the config file.")
 
 
-def transcribe_audio(audio: Audio):
-    print(audio.filePath)
-    audio_fp = audio.filePath
+def transcribe_audio(audio_fp):
+    print(audio_fp)
     audio_file = open(audio_fp, "rb")
     transcription = client.audio.transcriptions.create(
         model="whisper-1",
         file=audio_file
     )
     print(transcription)
-    print(transcription.text)
     return transcription.text
 
 
@@ -50,7 +48,6 @@ def translate_audio(audio_fp):
         file=audio_file
     )
     print(translation)
-    print(translation.text)
     return translation.text
 
 
