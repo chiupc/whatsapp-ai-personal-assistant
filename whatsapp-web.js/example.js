@@ -242,6 +242,7 @@ client.on('message', async msg => {
 	}
     else if (msg.body.toLowerCase().includes("summarize") || msg.body.toLowerCase().includes("summarise") 
         || msg.body.toLowerCase().includes("summary")){
+        client.sendMessage(msg.from, 'Sure, summarizing it for you in a bit.')
         //const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
         const cleanedFromNum = msg.from.match(/\d+/g).join('');
         let doTranslate = true;
@@ -259,9 +260,33 @@ client.on('message', async msg => {
                 console.log('Response:', response.data);
                 client.sendMessage(msg.from, response.data.summary);
                 client.sendMessage(msg.from, response.data.transcription);
-                
             })
             .catch(error => {
+                client.sendMessage(msg.from, 'Error in summarizing, please contact admin.')
+                console.error('Error:', error);
+            });
+    }
+    else if (msg.body.toLowerCase().includes('take order')){
+        client.sendMessage(msg.from, 'Got it! Taking the order for you in a bit.')
+        const cleanedFromNum = msg.from.match(/\d+/g).join('');
+        let doTranslate = true;
+        if(msg.body.toLowerCase().includes("original")) {
+            doTranslate = false;
+        }
+        const inputData = {
+            content_type: 'audio',  // Replace with actual audio data
+            username: cleanedFromNum,
+            do_translate: doTranslate,
+        };
+        // Make a POST request to the FastAPI endpoint
+        axios.post('http://127.0.0.1:8000/take_order/', inputData)
+            .then(response => {
+                console.log('Response:', response.data);
+                client.sendMessage(msg.from, response.data.orders);
+                client.sendMessage(msg.from, response.data.transcription);
+            })
+            .catch(error => {
+                client.sendMessage(msg.from, 'Error in extracting orders, please contact admin.')
                 console.error('Error:', error);
             });
     }

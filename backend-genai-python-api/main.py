@@ -12,10 +12,14 @@ class Audio(BaseModel):
     filePath: str
 
 
-class SummaryInput(BaseModel):
+class BaseInput(BaseModel):
     username: str
     content_type: str
     do_translate: bool
+
+
+class OrderInput(BaseInput):
+    pass
 
 
 
@@ -29,6 +33,26 @@ def read_api_key(key, config_file='config.ini', section='API'):
         raise KeyError(f"'{key}' not found in section '{section}' of the config file.")
 
 
+def get_audio_conversation(username, do_translate):
+    audio_dir_incoming = os.path.join(data_path, 'audio', 'incoming', username)
+    audio_dir_processed = os.path.join(data_path, 'audio', 'processed', username)
+    if not os.path.exists(audio_dir_processed):
+        os.makedirs(audio_dir_processed)
+        print(f"Directory {audio_dir_processed} created successfully.")
+    else:
+        print(f"Directory {audio_dir_processed} already exists.")
+
+    print(audio_dir_incoming)
+    ogg_files = glob.glob(os.path.join(audio_dir_incoming, '*.ogg'))
+    for ogg_file in ogg_files:
+        if do_translate:
+            conversation = conversation + ' ' + translate_audio(ogg_file)
+        else:
+            conversation = conversation + ' ' + transcribe_audio(ogg_file)
+        shutil.move(ogg_file, audio_dir_processed)
+    print('conversation')
+    print(conversation)
+    return conversation
 def transcribe_audio(audio_fp):
     print(audio_fp)
     audio_file = open(audio_fp, "rb")
@@ -76,7 +100,7 @@ def summarize_audio(username, do_translate=True):
 
 
 def summarize_instructions(conversation):
-    system_prompt = "You are a helpful assistant that can ignore errors in transcription, summarize the messages and capture only the important instructions that are related to popiah stall operations."
+    system_prompt = "You are a helpful assistant that corrects errors in transcription based on the conversation context and then capture only the important instructions with details that are related to food & beverage operations."
     temperature = 0
     response = client.chat.completions.create(
         model="gpt-4o",
@@ -94,6 +118,33 @@ def summarize_instructions(conversation):
     )
     print(response)
     return conversation, response.choices[0].message.content
+
+
+def extract_order(conversation):
+    system_prompt = "You are a helpful assistant that extract the order list from the message that is sent by the user in the format of <item name> - <quantity>."
+    temperature = 0
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        temperature=temperature,
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": "Please help to extract order from this message: {conversation}".format(conversation=conversation)
+            }
+        ]
+    )
+    print(response)
+    return conversation, response.choices[0].message.content
+
+
+def take_order(username, do_translate=True):
+    conversation = get_audio_conversation(username, do_translate)
+    orders = extract_order(conversation)
+    return conversation, orders
 
 
 app = FastAPI()
@@ -115,10 +166,10 @@ def create_item(audio: Audio):
 
 
 @router.post("/summarize/")
-def summarize(in_parms: SummaryInput):
+def summarize(in_parms: BaseInput):
     # Log the raw request body
     # body = await request.body()
-    #print("Raw request body:", request.body)
+    # print("Raw request body:", request.body)
     print(in_parms)
     print(in_parms.content_type)
     print(in_parms.username)
@@ -129,6 +180,17 @@ def summarize(in_parms: SummaryInput):
     if in_type == 'audio':
         conversation, instructions = summarize_audio(username, do_translate)
     return {"transcription": conversation, "summary": instructions}
+
+
+
+@router.post("/take_order/")
+def take_order_post(order_parms: OrderInput):
+    print(order_parms)
+    username = order_parms.username
+    in_type = order_parms.content_type
+    do_translate = order_parms.do_translate
+    conversation, orders = take_order(username, do_translate)
+    return {"transcription": conversation, "orders": orders}
 
 
 app.include_router(router)
