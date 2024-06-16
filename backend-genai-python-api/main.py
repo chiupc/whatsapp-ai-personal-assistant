@@ -140,7 +140,7 @@ def extract_order(conversation):
         ]
     )
     print(response)
-    return conversation, response.choices[0].message.content
+    return response.choices[0].message.content
 
 
 def take_order(username, do_translate=True):
