@@ -240,14 +240,19 @@ client.on('message', async msg => {
 
                 
 	}
-    else if (msg.body.toLowerCase() === 'summarize'){
+    else if (msg.body.toLowerCase().includes("summarize") || msg.body.toLowerCase().includes("summarise") 
+        || msg.body.toLowerCase().includes("summary")){
         //const cleanedNotifyName = msg._data.notifyName.replace(/\s+/g, '');
         const cleanedFromNum = msg.from.match(/\d+/g).join('');
+        let doTranslate = true;
+        if(msg.body.toLowerCase().includes("original")) {
+            doTranslate = false;
+        }
         const inputData = {
             content_type: 'audio',  // Replace with actual audio data
-            username: cleanedFromNum
+            username: cleanedFromNum,
+            do_translate: doTranslate,
         };
-
         // Make a POST request to the FastAPI endpoint
         axios.post('http://127.0.0.1:8000/summarize/', inputData)
             .then(response => {

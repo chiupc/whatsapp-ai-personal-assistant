@@ -15,6 +15,7 @@ class Audio(BaseModel):
 class SummaryInput(BaseModel):
     username: str
     content_type: str
+    do_translate: bool
 
 
 
@@ -53,7 +54,7 @@ def translate_audio(audio_fp):
     return translation.text
 
 
-def summarize_audio(username):
+def summarize_audio(username, do_translate=True):
     audio_dir_incoming = os.path.join(data_path, 'audio', 'incoming', username)
     audio_dir_processed = os.path.join(data_path, 'audio', 'processed', username)
     if not os.path.exists(audio_dir_processed):
@@ -66,7 +67,10 @@ def summarize_audio(username):
     ogg_files = glob.glob(os.path.join(audio_dir_incoming, '*.ogg'))
     conversation = ''
     for ogg_file in ogg_files:
-        conversation = conversation + ' ' + translate_audio(ogg_file)
+        if do_translate:
+            conversation = conversation + ' ' + translate_audio(ogg_file)
+        else:
+            conversation = conversation + ' ' + transcribe_audio(ogg_file)
         shutil.move(ogg_file, audio_dir_processed)
     print('conversation')
     print(conversation)
@@ -121,10 +125,12 @@ def summarize(in_parms: SummaryInput):
     print(in_parms)
     print(in_parms.content_type)
     print(in_parms.username)
+    print(in_parms.do_translate)
     username = in_parms.username
     in_type = in_parms.content_type
+    do_translate = in_parms.do_translate
     if in_type == 'audio':
-        conversation, instructions = summarize_audio(username)
+        conversation, instructions = summarize_audio(username, do_translate)
     return {"transcription": conversation, "summary": instructions}
 
 
